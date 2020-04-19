@@ -14,6 +14,9 @@
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/secondaryColor</item>
+        <item name="android:textColorPrimary">#eeffffff</item>
+        <item name="android:textColorSecondary">#eeffffff</item>
+
     </style>
 
 </resources>

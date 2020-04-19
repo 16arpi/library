@@ -1,12 +1,12 @@
 package com.pigeoff.library
 
 import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
         var toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         toolbar.setNavigationIcon(R.drawable.ic_action_menu)
+        toolbar.setTitleTextColor(Color.WHITE)
         supportActionBar?.setTitle(R.string.title_main)
 
 
@@ -177,9 +178,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }*/
             R.id.action_scan -> {
-                val toast2: Toast = Toast.makeText(this, "Scan action", Toast.LENGTH_SHORT)
                 Snackbar.make(this.findViewById(android.R.id.content), R.string.action_scan, Snackbar.LENGTH_SHORT).show()
-                toast2.show()
             }
         }
         return super.onOptionsItemSelected(item)
