@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Library</string>
+
+    <string name="title_main" >My library</string>
+    <string name="title_wish" >Wishlist</string>
+
+    <string name="action_search">Search</string>
+    <string name="action_scan">It doesn\'t work yet...</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_more">More</string>
+    <string name="action_location">Location</string>
+    <string name="action_notes" >Notes</string>
+    <string name="action_save" >Save</string>
+
+    <string name="detail_title" >Book\'s details</string>
+    <string name="published_in">Published in </string>
+    <string name="nb_pages" >Number of pages : </string>
+    <string name="too_bad" >¯\\_(ツ)_/¯</string>
+    <string name="nb_books_single" >One book to show</string>
+    <string name="nb_books" >books to show</string>
+    <string name="add_book_alert" >Book saved on the phone</string>
+    <string name="saved_book" >Book\'s details saved</string>
+    <string name="no_book" >There\'s no book to show.</string>
+    <string name="add_book" >Add a book</string>
+    <string name="pages_nocap" >pages</string>
+
+    <string name="delete_dialog_title" >Delete a book</string>
+    <string name="delete_dialog_question" >Do you really want to delete this book ?</string>
+    <string name="delete_dialog_cancel" >Cancel</string>
+    <string name="delete_dialog_submit" >Delete</string>
+
+</resources>

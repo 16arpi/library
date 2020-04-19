@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingLeft="22dp"
+    android:paddingTop="16dp"
+    android:paddingRight="22dp"
+    android:paddingBottom="16dp">
+
+    <TextView
+        android:id="@+id/textRecyclerHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/nb_books"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+        android:textColor="@color/material_on_surface_emphasis_medium" />
+
+    <LinearLayout
+        android:id="@+id/linearLayoutHeaderList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingTop="70dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/textViewEmoji"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:alpha="0.6"
+            android:text="@string/too_bad"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+            android:textColor="@color/secondaryColor" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="0.6"
+            android:text="@string/no_book"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+            android:textColor="@color/secondaryColor" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonHeaderList"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center|center_horizontal"
+            android:text="@string/add_book"
+            android:textAlignment="center"
+            android:textColor="@color/secondaryColor"
+            app:iconTint="@color/secondaryColor" />
+    </LinearLayout>
+
+</LinearLayout>

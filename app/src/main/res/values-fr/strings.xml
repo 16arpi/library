@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Bibliothèque</string>
+    <string name="title_main">Ma bibliothèque</string>
+    <string name="title_wish">Liste d\'envie</string>
+    <string name="action_search">Rechercher</string>
+    <string name="action_scan">Ça ne marche pas encore...</string>
+    <string name="action_delete">Supprimer</string>
+    <string name="action_more">Plus</string>
+    <string name="action_location">Emplacement</string>
+    <string name="action_notes">Notes</string>
+    <string name="action_save">Enregistrer</string>
+    <string name="detail_title">Détails du livre</string>
+    <string name="published_in">Publication :</string>
+    <string name="nb_pages">Nombre de pages</string>
+    <string name="too_bad">¯\\_(ツ)_/¯</string>
+    <string name="nb_books_single">Un livre à afficher</string>
+    <string name="nb_books">livres à afficher</string>
+    <string name="add_book_alert">Livre enregistré sur votre téléphone</string>
+    <string name="saved_book">Détails du livre enregistrés</string>
+    <string name="no_book">Il n\'y a aucun livre à afficher.</string>
+    <string name="add_book">Ajouter un livre</string>
+    <string name="pages_nocap">pages</string>
+    <string name="delete_dialog_title">Supprimer un livre</string>
+    <string name="delete_dialog_question">Voulez-vous vraiment supprimer ce livre ?</string>
+    <string name="delete_dialog_cancel">Annuler</string>
+    <string name="delete_dialog_submit">Supprimer</string>
+</resources>
