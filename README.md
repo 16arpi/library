@@ -10,7 +10,7 @@ Petit application android qui permet d'enregistrer les livres que l'on possède 
 * **Gson** - [dépôt Github](https://github.com/google/gson)
 * **Faker** [dépôt Github](https://github.com/cesarferreira/faker)
 * **Material Navigation View** - [dépôt Github](https://github.com/PatilShreyas/MaterialNavigationView-Android)
-
+* **Chip Input Layout** - [dépôt Github](https://github.com/tylersuehr7/chips-input-layout)
 ## Licence
 
 Sous licence GPL-3.0. Réutilisez à l'infinie ce code de basse qualité, mais n'oubliez pas de mentioner l'origine malgré tout.
