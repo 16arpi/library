@@ -28,6 +28,8 @@ class SearchActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search)
 
         var listExtra = intent.getStringExtra("list")
+        var isBorrowed = intent.getIntExtra("isBorrowed", 0)
+        var tagExtra: String? = intent.getStringExtra("tag")
 
         val searchText: EditText = findViewById(R.id.editText)
         val progressBar: ProgressBar = findViewById(R.id.progressBar)
@@ -37,51 +39,34 @@ class SearchActivity : AppCompatActivity() {
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
 
                 query = searchText.text.toString()
-                progressBar.visibility = View.VISIBLE
-                searchText.clearFocus()
-                hideKeyboard(this)
-                Thread {
+                if (query.isNotEmpty()) {
+                    progressBar.visibility = View.VISIBLE
+                    searchText.clearFocus()
+                    hideKeyboard(this)
+                    Thread {
 
-                    val newHTTPClient = HTTPClient()
-                    page = 0
-                    volumeQuery = newHTTPClient.searchForVolume(searchText.text.toString(), page)
+                        val newHTTPClient = HTTPClient()
+                        page = 0
+                        volumeQuery = newHTTPClient.searchForVolume(searchText.text.toString(), page)
 
-                    runOnUiThread {
-                        val recyclerView: RecyclerView =
-                            findViewById<RecyclerView>(R.id.recyclerView)
-                        recyclerView.layoutManager = LinearLayoutManager(this)
-                        recyclerView.adapter = SearchAdapter(this, volumeQuery, listExtra)
-                        progressBar.visibility = View.GONE
-
-
-                    }
-                }.start()
+                        runOnUiThread {
+                            val recyclerView: RecyclerView =
+                                findViewById<RecyclerView>(R.id.recyclerView)
+                            recyclerView.layoutManager = LinearLayoutManager(this)
+                            recyclerView.adapter = SearchAdapter(this, volumeQuery, listExtra, isBorrowed, tagExtra)
+                            progressBar.visibility = View.GONE
 
 
-                return@OnKeyListener true
+                        }
+                    }.start()
+
+
+                    return@OnKeyListener true
+                }
+
             }
             false
         })
-
-        /*val imageView: ImageView = findViewById(R.id.imageView)
-        imageView.setOnClickListener {
-            progressBar.visibility = View.VISIBLE
-            searchText.clearFocus()
-            hideKeyboard(this)
-            Thread {
-                page = 0
-                volumeQuery = HTTPClient().searchForVolume(searchText.text.toString(), page)
-
-                runOnUiThread {
-                    Log.i("INFO", volumeQuery.items!![1].volumeInfo!!.title)
-
-                    val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
-                    recyclerView.layoutManager = LinearLayoutManager(this)
-                    recyclerView.adapter = SearchAdapter(this, volumeQuery)
-                    progressBar.visibility = View.GONE
-                }
-            }.start()
-        }*/
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {

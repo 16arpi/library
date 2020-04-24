@@ -25,7 +25,7 @@ class VolumeClass {
             var readingModes: ReadingModes? = null
             var pageCount: Int? = null
             var printType: String? = null
-            var categories: List<String>? = null
+            var categories: ArrayList<String>? = null
             var maturityRating: String? = null
             var allowAnonLogging: Boolean? = null
             var contentVersion: String? = null

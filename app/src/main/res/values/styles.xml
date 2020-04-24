@@ -9,14 +9,45 @@
         <item name="colorSecondary" >@color/secondaryColor</item>
     </style>
 
-    <style name="AppThemeBar" parent="Theme.MaterialComponents.DayNight">
+    <style name="ChipTheme" parent="Theme.MaterialComponents.DayNight">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+        <item name="colorAccent">@color/secondaryColor</item>
+        <item name="colorSecondary" >@color/secondaryColor</item>
+    </style>
+
+    <style name="AppThemeBar" parent="ThemeOverlay.MaterialComponents.Dark">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/secondaryColor</item>
         <item name="android:textColorPrimary">#eeffffff</item>
         <item name="android:textColorSecondary">#eeffffff</item>
+        <item name="actionOverflowButtonStyle">@style/ToolbarOverflow</item>
+        <item name="android:actionOverflowMenuStyle">@style/Widget.AppCompat.PopupMenu.Overflow</item>
+        <item name="actionOverflowMenuStyle">@style/Widget.AppCompat.PopupMenu.Overflow</item>
+    </style>
 
+
+    <style name="ToolbarOverflow" parent="@style/Widget.AppCompat.Light.ActionButton.Overflow">
+        <item name="android:tint">@android:color/white</item>
+    </style>
+
+    <style name="ToolbarOverflowMenu" parent="@style/Widget.AppCompat.Light.PopupMenu">
+        <item name="android:actionMenuTextColor" >#DD000000</item>
+        <item name="actionMenuTextColor">#DD000000</item>
+        <item name="android:textColor">#DD000000</item>
+    </style>
+
+    <style name="Widget.App.Button.IconOnly" parent="Widget.MaterialComponents.Button">
+        <item name="iconPadding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:minHeight">48dp</item>
     </style>
 
 </resources>

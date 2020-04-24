@@ -1,5 +1,6 @@
 package com.pigeoff.library
 
+import com.pigeoff.library.database.*
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +13,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Room
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
@@ -21,102 +23,85 @@ class MainActivity : AppCompatActivity() {
 
     var navigationView: NavigationView? = null
     var drawerLayout: DrawerLayout? = null
-    var listGlobal: String? = ""
+    var recyclerView: RecyclerView? = null
+    var recyclerAdapter: MainAdapter? = null
+    var database: RmDatabase? = null
 
+    var LIST_GLOBAL: String? = ""
+    var TAG_GLOBAL: String = ""
     var RESULT_SEARCH_CODE = 1871
+    var IS_BORROWED = 0
+    var LIST_TAGS = arrayListOf<String>()
+
+    var NAV_ITEM_HOME = 1
+    var NAV_ITEM_WISH = 2
+    var NAV_ITEM_BORROWED = 3
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        try {
+            var oldDatabase = LegacyDB(this, null)
+            oldDatabase.migrateDatabse(this)
+        }
+        catch (e: Exception) {
+            Log.i("Error", e.toString())
+        }
+        finally {
+            database = Room.databaseBuilder(
+                this,
+                RmDatabase::class.java, "librarydb"
+            ).allowMainThreadQueries().addMigrations(RmMigration().MIGRATION_2_3).build()
+        }
+
+
         var toolbar: Toolbar = findViewById(R.id.toolbar)
+        navigationView = findViewById(R.id.navigationView)
+        setTagsMenu(navigationView)
+        drawerLayout = findViewById(R.id.drawerLayout)
+        recyclerView = findViewById(R.id.recyclerViewMain)
+        recyclerView?.layoutManager = LinearLayoutManager(this)
+
         setSupportActionBar(toolbar)
         toolbar.setNavigationIcon(R.drawable.ic_action_menu)
         toolbar.setTitleTextColor(Color.WHITE)
         supportActionBar?.setTitle(R.string.title_main)
 
+        navigationView?.bringToFront()
+        navigationView?.setNavigationItemSelectedListener {
+            Log.i("Item selected", it.itemId.toString()+it.title)
 
-        val database = LibraryDatabase(this, null)
-        val content = database.getAllBooksFromLibrary()
-        database.close()
-
-        var recyclerView: RecyclerView = findViewById(R.id.recyclerViewMain)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = MainAdapter(this, content, listGlobal!!)
-
-        var floating: FloatingActionButton = findViewById(R.id.floatinButton)
-        floating.setOnClickListener {
-            val intent = Intent(this, SearchActivity::class.java)
-            intent.putExtra("list", listGlobal)
-            startActivityForResult(intent, RESULT_SEARCH_CODE)
-        }
-
-        /* HANDLE NAVIGATION */
-        navigationView = findViewById(R.id.navigationView)
-        drawerLayout = findViewById(R.id.drawerLayout)
-
-        navigationView!!.bringToFront();
-        var homeItem = navigationView!!.getMenu().findItem(R.id.nav_item_home)
-        homeItem.isChecked = true
-
-        navigationView!!.setNavigationItemSelectedListener {
             when(it.itemId) {
                 R.id.nav_item_home -> {
-                    if (it.isChecked) {
-                        Log.i("Info", "HOME CLICK FALSE")
-                        false
-                    }
-
-                    else {
-                        Log.i("Info", "HOME CLICK TRUE")
-                        listGlobal = ""
-                        val newdatabase = LibraryDatabase(this, null)
-                        val newcontent = newdatabase.getAllBooksFromLibrary()
-                        newdatabase.close()
-
-                        var newrecyclerView: RecyclerView = findViewById(R.id.recyclerViewMain)
-                        newrecyclerView.layoutManager = LinearLayoutManager(this)
-                        newrecyclerView.adapter = MainAdapter(this, newcontent, listGlobal!!)
-                        it.isChecked = true
-
-                        var collapseToolbar: CollapsingToolbarLayout = findViewById(R.id.collapseToolbar)
-                        collapseToolbar.setTitle(getString(R.string.title_main))
-
-                        drawerLayout!!.closeDrawer(GravityCompat.START)
-                    }
+                    navigationUpdateUI(it, NAV_ITEM_HOME)
                 }
 
                 R.id.nav_item_wishes -> {
-                    if (it.isChecked) {
-                        Log.i("Info", "WISH CLICK FALSE")
-                        false
-                    }
-
-                    else {
-                        Log.i("Info", "WISH CLICK TRUE")
-                        var list = "wish"
-                        listGlobal = "wish"
-                        var order = LibraryDatabase.COLUMN_ID+" DESC"
-                        val newdatabase = LibraryDatabase(this, null)
-                        val newcontent = newdatabase.getAllBooksFromList(list, order)
-                        newdatabase.close()
-
-                        var newrecyclerView: RecyclerView = findViewById(R.id.recyclerViewMain)
-                        newrecyclerView.layoutManager = LinearLayoutManager(this)
-                        newrecyclerView.adapter = MainAdapter(this, newcontent, listGlobal!!)
-                        it.isChecked = true
-
-                        var collapseToolbar: CollapsingToolbarLayout = findViewById(R.id.collapseToolbar)
-                        collapseToolbar.setTitle(getString(R.string.title_wish))
-
-                        drawerLayout!!.closeDrawer(GravityCompat.START)
-                    }
+                    navigationUpdateUI(it, NAV_ITEM_WISH)
+                }
+                R.id.nav_item_borrowed -> {
+                    navigationUpdateUI(it, NAV_ITEM_BORROWED)
+                }
+                else -> {
+                    navigationUpdateUI(it, it.itemId)
                 }
             }
             true
         }
 
-        navigationView!!.bringToFront();
+        navigationView?.menu?.getItem(0)?.setChecked(true)
+        navigationUpdateUI(navigationView?.menu!!.getItem(0), NAV_ITEM_HOME)
+
+        var floating: FloatingActionButton = findViewById(R.id.floatinButton)
+        floating.setOnClickListener {
+            val intent = Intent(this, SearchActivity::class.java)
+            intent.putExtra("list", LIST_GLOBAL)
+            intent.putExtra("isBorrowed", IS_BORROWED)
+            intent.putExtra("tag", TAG_GLOBAL)
+            startActivityForResult(intent, RESULT_SEARCH_CODE)
+        }
 
     }
 
@@ -134,31 +119,50 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
+        val oldId = navigationView?.checkedItem?.itemId
+        navigationView?.menu?.removeGroup(R.id.main_group)
+        navigationView?.inflateMenu(R.menu.nav_menu)
+        setTagsMenu(navigationView)
+        if (navigationView?.menu?.findItem(oldId!!)?.title != null && navigationView?.menu?.findItem(oldId!!)?.title!!.isNotEmpty()) {
+            navigationView?.menu?.findItem(oldId!!)?.setChecked(true)
+        }
+
         var item = navigationView!!.checkedItem
 
         when(item?.itemId) {
             R.id.nav_item_home -> {
-                listGlobal = ""
-                val database = LibraryDatabase(this, null)
-                val content = database.getAllBooksFromLibrary()
-                database.close()
-
-                var recyclerView: RecyclerView = findViewById(R.id.recyclerViewMain)
-                recyclerView.layoutManager = LinearLayoutManager(this)
-                recyclerView.adapter = MainAdapter(this, content, listGlobal!!)
+                LIST_GLOBAL = ""
+                TAG_GLOBAL = ""
+                IS_BORROWED = 0
+                val content = database!!.bookDao().getAllBooksFromLibrary()
+                recyclerView?.adapter = MainAdapter(this, content, LIST_GLOBAL!!, IS_BORROWED, TAG_GLOBAL, LIST_TAGS)
             }
 
             R.id.nav_item_wishes -> {
-                listGlobal = "wish"
-                val database = LibraryDatabase(this, null)
+                LIST_GLOBAL = "wish"
+                TAG_GLOBAL = ""
+                IS_BORROWED = 0
                 val list = "wish"
-                val order = LibraryDatabase.COLUMN_TITLE
-                val content = database.getAllBooksFromList(list, order)
-                database.close()
+                val order = "id DESC"
+                val content = database!!.bookDao().getAllBooksFromList(list, order)
+                recyclerView?.adapter = MainAdapter(this, content, LIST_GLOBAL!!, IS_BORROWED, TAG_GLOBAL, LIST_TAGS)
+            }
 
-                var recyclerView: RecyclerView = findViewById(R.id.recyclerViewMain)
-                recyclerView.layoutManager = LinearLayoutManager(this)
-                recyclerView.adapter = MainAdapter(this, content, listGlobal!!)
+            R.id.nav_item_borrowed -> {
+                LIST_GLOBAL = ""
+                IS_BORROWED = 1
+                TAG_GLOBAL = ""
+                val content = database!!.bookDao().getAllBorrowed()
+                recyclerView?.adapter = MainAdapter(this, content, LIST_GLOBAL!!, IS_BORROWED, TAG_GLOBAL, LIST_TAGS)
+
+            }
+
+            else -> {
+                IS_BORROWED = 0
+                var tag = item?.title.toString()
+                TAG_GLOBAL = tag
+                val content = database!!.bookDao().getAllFromTag(tag)
+                recyclerView?.adapter = MainAdapter(this, content, LIST_GLOBAL!!, IS_BORROWED, TAG_GLOBAL, LIST_TAGS)
             }
         }
 
@@ -182,5 +186,152 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun navigationUpdateUI(it: MenuItem, param: Int) {
+        when(it.itemId) {
+            R.id.nav_item_home -> {
+                if (it.isChecked) {
+                    Log.i("Info", "HOME CLICK FALSE")
+                    false
+                }
+
+                else {
+                    Log.i("Info", "HOME CLICK TRUE")
+                    LIST_GLOBAL = ""
+                    IS_BORROWED = 0
+                    TAG_GLOBAL = ""
+                    val content = database!!.bookDao().getAllBooksFromLibrary()
+
+                    recyclerAdapter = MainAdapter(this, content, LIST_GLOBAL!!, IS_BORROWED, TAG_GLOBAL, LIST_TAGS)
+                    recyclerView?.adapter = recyclerAdapter
+                    it.isChecked = true
+
+                    var collapseToolbar: CollapsingToolbarLayout = findViewById(R.id.collapseToolbar)
+                    supportActionBar!!.setTitle(getString(R.string.title_main))
+                    collapseToolbar.setTitle(getString(R.string.title_main))
+
+                    drawerLayout!!.closeDrawer(GravityCompat.START)
+                }
+            }
+
+            R.id.nav_item_wishes -> {
+                if (it.isChecked) {
+                    Log.i("Info", "WISH CLICK FALSE")
+                    false
+                }
+
+                else {
+                    Log.i("Info", "WISH CLICK TRUE")
+                    var list = "wish"
+                    LIST_GLOBAL = "wish"
+                    IS_BORROWED = 0
+                    TAG_GLOBAL = ""
+                    var order = "id DESC"
+                    val content = database!!.bookDao().getAllBooksFromList(list, order)
+
+                    recyclerAdapter = MainAdapter(this, content, LIST_GLOBAL!!, IS_BORROWED, TAG_GLOBAL, LIST_TAGS)
+                    recyclerView?.adapter = recyclerAdapter
+                    it.isChecked = true
+
+                    var collapseToolbar: CollapsingToolbarLayout = findViewById(R.id.collapseToolbar)
+                    supportActionBar!!.setTitle(getString(R.string.title_wish))
+                    collapseToolbar.setTitle(getString(R.string.title_wish))
+
+                    drawerLayout!!.closeDrawer(GravityCompat.START)
+                }
+            }
+
+            R.id.nav_item_borrowed -> {
+                if (it.isChecked) {
+                    Log.i("Info", "HOME CLICK FALSE")
+                    false
+                }
+
+                else {
+                    Log.i("Info", "HOME CLICK TRUE")
+                    IS_BORROWED = 1
+                    LIST_GLOBAL = ""
+                    TAG_GLOBAL = ""
+                    val content = database!!.bookDao().getAllBorrowed()
+
+                    recyclerAdapter = MainAdapter(this, content, LIST_GLOBAL!!, IS_BORROWED, TAG_GLOBAL, LIST_TAGS)
+                    recyclerView?.adapter = recyclerAdapter
+                    it.isChecked = true
+
+                    var collapseToolbar: CollapsingToolbarLayout = findViewById(R.id.collapseToolbar)
+                    supportActionBar!!.setTitle(getString(R.string.title_borrowed))
+                    collapseToolbar.setTitle(getString(R.string.title_borrowed))
+
+                    drawerLayout!!.closeDrawer(GravityCompat.START)
+                }
+            }
+
+            else -> {
+                if (it.isChecked) {
+                    false
+                }
+                else {
+                    IS_BORROWED = 0
+                    LIST_GLOBAL = ""
+                    val tag = it.title.toString()
+                    TAG_GLOBAL = tag
+                    val content = database!!.bookDao().getAllFromTag(tag)
+
+                    recyclerAdapter = MainAdapter(this, content, LIST_GLOBAL!!, IS_BORROWED, TAG_GLOBAL, LIST_TAGS)
+                    recyclerView?.adapter = recyclerAdapter
+                    it.isChecked = true
+
+                    var collapseToolbar: CollapsingToolbarLayout = findViewById(R.id.collapseToolbar)
+                    supportActionBar!!.setTitle(it.title)
+                    collapseToolbar.setTitle(it.title)
+
+                    drawerLayout!!.closeDrawer(GravityCompat.START)
+                }
+            }
+
+
+        }
+    }
+
+    fun setTagsMenu(nav: NavigationView?) {
+        LIST_TAGS = getAllTags(database!!)
+        LIST_TAGS.sort()
+        var navMenu = nav?.menu
+        var id = 34
+        if (LIST_TAGS != null && LIST_TAGS.isNotEmpty()) {
+            for (element in LIST_TAGS!!) {
+                navMenu?.add(R.id.main_group, id, Menu.NONE, element)
+                navMenu?.findItem(id)?.setIcon(R.drawable.ic_bookmark_border_black_24dp)?.setCheckable(true)
+                id++
+            }
+        }
+        else navMenu?.add(R.id.main_group, Menu.NONE, Menu.NONE, R.string.tags_indicator_empty)?.setCheckable(false)?.setEnabled(false)?.setIcon(R.drawable.ic_bookmark_border_black_24dp)
+    }
+
+
+    fun getAllTags(database: RmDatabase) : ArrayList<String>{
+        var allBooks = database.bookDao().getAllBooksFromLibrary()
+        var allTags: ArrayList<String> = arrayListOf()
+        for (element in allBooks) {
+            var tags = element.tag
+            if (tags != null && tags.isNotEmpty()) {
+                for (item in tags) {
+                    Log.i("Tag existing", item)
+                    if (!allTags.contains(item) && item.isNotEmpty()) allTags.add(item)
+                }
+            }
+        }
+        allTags.sort()
+        return allTags
+    }
+
+    override fun onBackPressed() {
+        if (drawerLayout!!.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout?.closeDrawer(GravityCompat.START)
+        }
+        else {
+            super.onBackPressed()
+        }
     }
 }

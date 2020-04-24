@@ -7,6 +7,11 @@
             android:icon="@drawable/ic_action_home"
             />
         <item
+            android:id="@+id/nav_item_borrowed"
+            android:title="@string/title_borrowed"
+            android:icon="@drawable/ic_local_library_black_24dp"
+            />
+        <item
             android:id="@+id/nav_item_wishes"
             android:title="@string/title_wish"
             android:icon="@drawable/ic_action_wishes"

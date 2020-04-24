@@ -3,6 +3,7 @@
 
     <string name="title_main" >My library</string>
     <string name="title_wish" >Wishlist</string>
+    <string name="title_borrowed">Borrowed books</string>
 
     <string name="action_search">Search</string>
     <string name="action_scan">It doesn\'t work yet...</string>
@@ -28,5 +29,14 @@
     <string name="delete_dialog_question" >Do you really want to delete this book ?</string>
     <string name="delete_dialog_cancel" >Cancel</string>
     <string name="delete_dialog_submit" >Delete</string>
-
+    <string name="dialog_confirm" >OK</string>
+    <string name="action_mark">Mark</string>
+    <string name="add_list">Add a list</string>
+    <string name="borrowed_deadline_indicator">Return date</string>
+    <string name="borrowed_deadline_indicator_message" >Return date of the book</string>
+    <string name="tags_indicator_singular">Tag</string>
+    <string name="tags_indicator_plural">Tags</string>
+    <string name="tags_indicator_add">Add a tag</string>
+    <string name="tags_indicator_empty">No tag</string>
+    <string name="action_add_question">Add the book ?</string>
 </resources>

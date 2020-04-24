@@ -32,11 +32,8 @@
                     android:id="@+id/cardImage"
                     android:layout_width="70dp"
                     android:layout_height="100dp"
-                    android:layout_marginEnd="24dp"
                     android:elevation="0dp"
                     app:cardBackgroundColor="@color/primaryLightColor"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/linearLayout3"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -59,11 +56,11 @@
                 <LinearLayout
                     android:id="@+id/linearLayout3"
                     android:layout_width="0dp"
-                    android:layout_height="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:gravity="start|top"
                     android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toEndOf="@+id/cardImage"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -101,6 +98,16 @@
                         android:text="TextView"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
                         android:visibility="gone" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipBorrowedList"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#66000000"
+                        android:visibility="gone"
+                        android:layout_marginTop="8dp"
+                        app:chipIcon="@drawable/ic_local_library_black_24dp"
+                        app:chipIconTint="#66000000" />
 
                 </LinearLayout>
 
