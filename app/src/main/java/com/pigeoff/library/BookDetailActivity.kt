@@ -154,6 +154,7 @@ class BookDetailActivity : AppCompatActivity() {
         }
 
 
+
         editBorrowedDeadline.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 borrowedDateGlobal = editBorrowedDeadline.text.toString()

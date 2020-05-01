@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.setPadding
@@ -88,20 +89,22 @@ class SearchAdapter(private val context: SearchActivity, private val volumesList
 
             var textTitle = TextView(context)
             textTitle.setText(context.getString(R.string.borrowed_deadline_indicator_message))
-            var px = 32
+            var px = 24
             textTitle.setPadding(
                 px*context.getResources().getDisplayMetrics().density.toInt(),
-                24*context.getResources().getDisplayMetrics().density.toInt(),
+                16*context.getResources().getDisplayMetrics().density.toInt(),
                 px*context.getResources().getDisplayMetrics().density.toInt(),
-                24*context.getResources().getDisplayMetrics().density.toInt())
+                16*context.getResources().getDisplayMetrics().density.toInt())
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                textTitle.setTextAppearance(R.style.TextAppearance_MaterialComponents_Headline6)
+                textTitle.setTextAppearance(R.style.TextAppearance_MaterialComponents_Subtitle1)
             }
+            var scrollView = ScrollView(context)
             var datePicker = DatePicker(context)
             var view = LinearLayout(context)
             view.orientation = LinearLayout.VERTICAL
             view.addView(textTitle)
             view.addView(datePicker)
+            scrollView.addView(view)
 
             if (isBorrowed == 1) {
                 MaterialAlertDialogBuilder(context)
@@ -112,7 +115,7 @@ class SearchAdapter(private val context: SearchActivity, private val volumesList
                     .setPositiveButton(context.getString(R.string.dialog_confirm)) { dialog, which ->
                         //Date picker
                         MaterialAlertDialogBuilder(context)
-                            .setView(view)
+                            .setView(scrollView)
                             .setNegativeButton(context.getString(R.string.delete_dialog_cancel)) { dialog, which ->
                                 //DO Nothing
                             }
