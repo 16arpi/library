@@ -2,7 +2,9 @@ package com.pigeoff.library
 
 import android.app.Activity
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -13,12 +15,16 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_search.*
+import java.net.InetAddress
 
 
 class SearchActivity : AppCompatActivity() {
 
     var isLoading: Boolean = false
+    var networkOk: Boolean = false
     var page: Int = 0
     var query: String = ""
     var volumeQuery: VolumeClass = VolumeClass()
@@ -26,6 +32,22 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        /*Thread {
+            var isConnected = checkForInternet()
+            networkOk = isConnected
+            runOnUiThread {
+                if (!networkOk) {
+                    MaterialAlertDialogBuilder(this)
+                        .setMessage(R.string.indicator_no_internet)
+                        .setPositiveButton(R.string.dialog_confirm, DialogInterface.OnClickListener { dialog, which ->
+
+                        })
+                        .show()
+                }
+            }
+        }.run()*/
+
 
         var listExtra = intent.getStringExtra("list")
         var isBorrowed = intent.getIntExtra("isBorrowed", 0)
@@ -41,25 +63,43 @@ class SearchActivity : AppCompatActivity() {
                 query = searchText.text.toString()
                 if (query.isNotEmpty()) {
                     progressBar.visibility = View.VISIBLE
-                    searchText.clearFocus()
-                    hideKeyboard(this)
-                    Thread {
 
+                    Thread {
                         val newHTTPClient = HTTPClient()
                         page = 0
-                        volumeQuery = newHTTPClient.searchForVolume(searchText.text.toString(), page)
-
-                        runOnUiThread {
-                            val recyclerView: RecyclerView =
-                                findViewById<RecyclerView>(R.id.recyclerView)
-                            recyclerView.layoutManager = LinearLayoutManager(this)
-                            recyclerView.adapter = SearchAdapter(this, volumeQuery, listExtra, isBorrowed, tagExtra)
-                            progressBar.visibility = View.GONE
-
-
+                        try {
+                            volumeQuery = newHTTPClient.searchForVolume(searchText.text.toString(), page)
                         }
-                    }.start()
+                        catch (e: Exception) {
+                            volumeQuery = VolumeClass()
+                        }
 
+                        if (volumeQuery.items?.count() == null) {
+                            /*MaterialAlertDialogBuilder(this)
+                                .setMessage(R.string.indicator_no_internet)
+                                .setPositiveButton(R.string.dialog_confirm, DialogInterface.OnClickListener { dialog, which ->
+
+                                })
+                                .show()*/
+                            runOnUiThread {
+                                searchText.clearFocus()
+                                progressBar.visibility = View.GONE
+                                Snackbar.make(findViewById(android.R.id.content), getString(R.string.indicator_no_internet), Snackbar.LENGTH_SHORT).show()
+                            }
+                            hideKeyboard(this)
+                        }
+                        else {
+                            runOnUiThread {
+                                val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
+                                recyclerView.layoutManager = LinearLayoutManager(this)
+                                recyclerView.adapter = SearchAdapter(this, volumeQuery, listExtra, isBorrowed, tagExtra)
+                                progressBar.visibility = View.GONE
+                                searchText.clearFocus()
+                            }
+                            hideKeyboard(this)
+                        }
+
+                    }.start()
 
                     return@OnKeyListener true
                 }
@@ -75,8 +115,7 @@ class SearchActivity : AppCompatActivity() {
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                val linearLayoutManager =
-                    recyclerView.layoutManager as LinearLayoutManager?
+                val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager?
                 if (!isLoading) {
                     if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == recyclerView.getAdapter()!!.getItemCount() - 1) { //bottom of list!
 
@@ -85,18 +124,35 @@ class SearchActivity : AppCompatActivity() {
                         Thread {
                             page += 10
                             val newHTTPClient = HTTPClient()
-                            val newVolumeQuery: VolumeClass = newHTTPClient.searchForVolume(query, page)
+                            var newVolumeQuery = VolumeClass()
+                            try {
+                                newVolumeQuery = newHTTPClient.searchForVolume(query, page)
+                            }
+                            catch (e: Exception) {
+                                newVolumeQuery = VolumeClass()
+                            }
 
-                            runOnUiThread {
+                            if (newVolumeQuery.items?.count() != null) {
+                                runOnUiThread {
 
-                                newVolumeQuery.items!!.forEach {
-                                    volumeQuery.items!!.add(it)
+                                    newVolumeQuery.items!!.forEach {
+                                        volumeQuery.items!!.add(it)
+                                    }
+
+                                    recyclerView.adapter!!.notifyItemInserted(recyclerView.getAdapter()!!.getItemCount())
+                                    recyclerView.scrollToPosition(recyclerView.getAdapter()!!.getItemCount())
+                                    isLoading = false
+                                    progressBar.visibility = View.GONE
                                 }
+                            }
+                            else {
+                                runOnUiThread {
+                                    page -= 10
+                                    isLoading = false
+                                    progressBar.visibility = View.GONE
 
-                                recyclerView.adapter!!.notifyItemInserted(recyclerView.getAdapter()!!.getItemCount())
-                                recyclerView.scrollToPosition(recyclerView.getAdapter()!!.getItemCount())
-                                isLoading = false
-                                progressBar.visibility = View.GONE
+                                    Snackbar.make(findViewById(android.R.id.content), getString(R.string.indicator_no_internet), Snackbar.LENGTH_SHORT).show()
+                                }
                             }
                         }.start()
                     }
@@ -129,6 +185,15 @@ class SearchActivity : AppCompatActivity() {
             val imm: InputMethodManager =
                 activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
+
+    private fun checkForInternet(): Boolean {
+        try {
+            val ipAddr: InetAddress = InetAddress.getByName("google.com")
+            return !ipAddr.equals("")
+        } catch (e: Exception) {
+            return false
         }
     }
 

@@ -1,13 +1,12 @@
 package com.pigeoff.library
 
-import com.pigeoff.library.database.*
 import android.content.Intent
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -18,6 +17,10 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.pigeoff.library.database.LegacyDB
+import com.pigeoff.library.database.RmDatabase
+import com.pigeoff.library.database.RmMigration
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -182,7 +185,8 @@ class MainActivity : AppCompatActivity() {
                 true
             }*/
             R.id.action_scan -> {
-                Snackbar.make(this.findViewById(android.R.id.content), R.string.action_scan, Snackbar.LENGTH_SHORT).show()
+                var snackbar = Snackbar.make(this.findViewById(android.R.id.content), R.string.action_scan, Snackbar.LENGTH_SHORT)
+                snackbar.show()
             }
         }
         return super.onOptionsItemSelected(item)

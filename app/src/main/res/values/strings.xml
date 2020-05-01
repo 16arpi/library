@@ -39,4 +39,5 @@
     <string name="tags_indicator_add">Add a tag</string>
     <string name="tags_indicator_empty">No tag</string>
     <string name="action_add_question">Add the book ?</string>
+    <string name="indicator_no_internet">Please check your network connexion</string>
 </resources>

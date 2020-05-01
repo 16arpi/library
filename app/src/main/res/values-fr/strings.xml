@@ -36,4 +36,5 @@
     <string name="tags_indicator_add">Ajouter un tag</string>
     <string name="tags_indicator_empty">Aucun mot-clé</string>
     <string name="action_add_question">Ajouter le livre ?</string>
+    <string name="indicator_no_internet">Merci de vérifier votre connexion internet</string>
 </resources>
