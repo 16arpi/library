@@ -2,9 +2,7 @@ package com.pigeoff.library
 
 import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -15,16 +13,13 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_search.*
-import java.net.InetAddress
 
 
 class SearchActivity : AppCompatActivity() {
 
     var isLoading: Boolean = false
-    var networkOk: Boolean = false
     var page: Int = 0
     var query: String = ""
     var volumeQuery: VolumeClass = VolumeClass()
@@ -32,22 +27,6 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-
-        /*Thread {
-            var isConnected = checkForInternet()
-            networkOk = isConnected
-            runOnUiThread {
-                if (!networkOk) {
-                    MaterialAlertDialogBuilder(this)
-                        .setMessage(R.string.indicator_no_internet)
-                        .setPositiveButton(R.string.dialog_confirm, DialogInterface.OnClickListener { dialog, which ->
-
-                        })
-                        .show()
-                }
-            }
-        }.run()*/
-
 
         var listExtra = intent.getStringExtra("list")
         var isBorrowed = intent.getIntExtra("isBorrowed", 0)
@@ -174,10 +153,6 @@ class SearchActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    fun doMySearch(query: String) {
-
-    }
-
     fun hideKeyboard(activity: Activity) {
         val view =
             activity.findViewById<View>(android.R.id.content)
@@ -185,15 +160,6 @@ class SearchActivity : AppCompatActivity() {
             val imm: InputMethodManager =
                 activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view.windowToken, 0)
-        }
-    }
-
-    private fun checkForInternet(): Boolean {
-        try {
-            val ipAddr: InetAddress = InetAddress.getByName("google.com")
-            return !ipAddr.equals("")
-        } catch (e: Exception) {
-            return false
         }
     }
 
